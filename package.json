@@ -1,0 +1,51 @@
+{
+  "name": "continue-on-next",
+  "displayName": "Continue On Next",
+  "version": "0.0.1",
+  "publisher": "tamuratak",
+  "license": "MIT",
+  "description": "Make the current document continue on the next tab",
+  "homepage": "https://github.com/tamuratak/vscode-continue-on-next",
+  "main": "./out/src/extension.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tamuratak/vscode-continue-on-next.git"
+  },
+  "engines": {
+    "vscode": "^1.34.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "continue-on-next.continueOnRight",
+        "title": "Continue On Right"
+      }
+    ]
+  },
+  "activationEvents": [
+    "onCommand:continue-on-next.continueOnRight"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^12",
+    "@types/vscode": "^1.43.0",
+    "@typescript-eslint/eslint-plugin": "^2.24.0",
+    "@typescript-eslint/parser": "^2.24.0",
+    "eslint": "^6.8.0",
+    "mocha": "^7.1.1",
+    "typescript": "^3.8.3",
+    "vscode-test": "^1.3.0"
+  },
+  "files": [
+    "out/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "build": "npm run compile",
+    "compile": "tsc -p ./",
+    "clean": "rm -rf out/src/* out/test/*",
+    "lint": "eslint --cache --ext .ts .",
+    "test": "mocha --ui tdd out/test/**/*.js"
+  }
+}
