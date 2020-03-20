@@ -1,74 +1,48 @@
 import * as vscode from 'vscode'
 
-function getEditor(doc: vscode.TextDocument, column: vscode.ViewColumn | undefined) {
-    for (const editor of vscode.window.visibleTextEditors) {
-        if (editor.document === doc && column && editor.viewColumn === column) {
-            return editor
-        }
-    }
-    return
-}
-
-export class Scroller {
-    next?: Scroller
-    doc: vscode.TextDocument
-    column: vscode.ViewColumn | undefined
-
-    constructor(editor: vscode.TextEditor) {
-        this.doc = editor.document
-        this.column = editor.viewColumn
-    }
-
-    revealeNextLineAtTop(range: vscode.Range) {
-        const endPos = new vscode.Position(range.end.line + 1, 0)
-        const editor = getEditor(this.doc, this.column)
-        editor?.revealRange(new vscode.Range(range.end, endPos), vscode.TextEditorRevealType.AtTop)
-    }
-
-}
-
 export class ScrollerManager {
-    editorMap: Map<string, Scroller>
     disposables: vscode.Disposable[]
 
     constructor() {
-        this.editorMap = new Map()
         vscode.window.onDidChangeTextEditorVisibleRanges((ev) => {
             const editor = ev.textEditor
-            const sc= this.editorMap.get(JSON.stringify([editor.document.uri.toString(), editor.viewColumn]))
-            if (!sc || !sc.next || vscode.window.activeTextEditor !== editor) {
+            const nextEditor = this.getNextActiveEditor(editor)
+            if (!nextEditor) {
                 return
             }
             const range = ev.visibleRanges[0]
-            sc.next.revealeNextLineAtTop(range)
+            this.scrollNextEditor(nextEditor, range)
         })
     }
 
-    createScroller(editor: vscode.TextEditor) {
-        const sc = new Scroller(editor)
-        this.editorMap.set(JSON.stringify([editor.document.uri.toString(), editor.viewColumn]), sc)
-        return sc
+    scrollNextEditor(nextEditor: vscode.TextEditor, range: vscode.Range) {
+        const endPos = new vscode.Position(range.end.line + 1, 0)
+        nextEditor.revealRange(new vscode.Range(range.end, endPos), vscode.TextEditorRevealType.AtTop)
     }
 
-    get(editor: vscode.TextEditor) {
-        const sc = this.editorMap.get(JSON.stringify([editor.document.uri.toString(), editor.viewColumn]))
-        if (sc) {
-            return sc
-        } else {
-            return this.createScroller(editor)
+    getNextActiveEditor(editor: vscode.TextEditor) {
+        const column = editor.viewColumn
+        if (column === undefined) {
+            return
         }
+        for (const ed of vscode.window.visibleTextEditors) {
+            if (column + 1 === ed.viewColumn) {
+                return ed
+            }
+        }
+        return
     }
 
-    async continueOnRight() {
+    continueOnRight() {
         const activeEditor = vscode.window.activeTextEditor
         if (!activeEditor) {
             return
         }
-        const sc = this.get(activeEditor)
-        const doc = sc.doc
-        const nextEditor = await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside, true)
-        const next = this.createScroller(nextEditor)
-        sc.next = next
-        next.revealeNextLineAtTop(activeEditor.visibleRanges[0])
+        const nextEditor = this.getNextActiveEditor(activeEditor)
+        if (!nextEditor) {
+            return
+        }
+        const range = activeEditor.visibleRanges[0]
+        this.scrollNextEditor(nextEditor, range)
     }
 }
