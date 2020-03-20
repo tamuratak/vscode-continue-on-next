@@ -17,13 +17,17 @@
   "contributes": {
     "commands": [
       {
-        "command": "continue-on-next.continueOnRight",
-        "title": "Continue On Right"
+        "command": "continue-on-next.start",
+        "title": "Continue On Right: Start"
+      },
+      {
+        "command": "continue-on-next.stop",
+        "title": "Continue On Right: Stop"
       }
     ]
   },
   "activationEvents": [
-    "onCommand:continue-on-next.continueOnRight"
+    "onCommand:continue-on-next.start"
   ],
   "dependencies": {},
   "devDependencies": {
