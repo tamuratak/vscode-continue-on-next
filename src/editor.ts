@@ -45,9 +45,9 @@ export class ScrollerManager {
         editor.setDecorations(deco, [range])
     }
 
-    scrollNextEditor(nextEditor: vscode.TextEditor, range: vscode.Range) {
-        const begPos = new vscode.Position(range.end.line - this.overlap, 0)
-        const endPos = new vscode.Position(range.end.line + 1, 0)
+    scrollNextEditor(nextEditor: vscode.TextEditor, visibleRange: vscode.Range) {
+        const begPos = new vscode.Position(visibleRange.end.line - this.overlap, 0)
+        const endPos = new vscode.Position(visibleRange.end.line + 1, 0)
         nextEditor.revealRange(new vscode.Range(begPos, endPos), vscode.TextEditorRevealType.AtTop)
     }
 
@@ -74,6 +74,8 @@ export class ScrollerManager {
             return
         }
         const range = activeEditor.visibleRanges[0]
+        const lastLine = this.getLastLine(range)
+        this.decorate(activeEditor, lastLine)
         this.scrollNextEditor(nextEditor, range)
     }
 }
