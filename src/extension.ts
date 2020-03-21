@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import {ScrollManager} from './editor'
+import {ScrollManager} from './manager'
 
 export function activate(context: vscode.ExtensionContext) {
     const manager = new ScrollManager()
