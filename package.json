@@ -17,17 +17,22 @@
   "contributes": {
     "commands": [
       {
-        "command": "continue-on-next.start",
-        "title": "Continue On Right: Start"
+        "command": "continue-on-next.right",
+        "title": "Continue On Next: Right"
+      },
+      {
+        "command": "continue-on-next.left",
+        "title": "Continue On Next: Left"
       },
       {
         "command": "continue-on-next.stop",
-        "title": "Continue On Right: Stop"
+        "title": "Continue On Next: Stop"
       }
     ]
   },
   "activationEvents": [
-    "onCommand:continue-on-next.start"
+    "onCommand:continue-on-next.right",
+    "onCommand:continue-on-next.left"
   ],
   "dependencies": {},
   "devDependencies": {

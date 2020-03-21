@@ -1,10 +1,13 @@
 import * as vscode from 'vscode'
 
+type LR = 'left' | 'right'
+
 export class ScrollManager {
     scrollEvent?: vscode.Disposable
     changeVisibleTextEditors: vscode.Disposable
     decorationMap: Map<vscode.TextEditor, vscode.TextEditorDecorationType> = new Map()
     overlapLines: number = 0
+    currentLeftRight: LR = 'right'
 
     constructor() {
         this.changeVisibleTextEditors = vscode.window.onDidChangeVisibleTextEditors(() => {
@@ -28,13 +31,12 @@ export class ScrollManager {
         this.clearDecorationMap()
     }
 
-    start() {
-        if (this.scrollEvent) {
-            return
-        }
+    start(lr: LR = 'right') {
+        this.currentLeftRight = lr
+        this.stop()
         this.scrollEvent = vscode.window.onDidChangeTextEditorVisibleRanges((ev) => {
             const editor = ev.textEditor
-            const nextEditor = this.getNextActiveEditor(editor)
+            const nextEditor = this.getNextEditor(editor)
             if (!nextEditor) {
                 return
             }
@@ -69,9 +71,9 @@ export class ScrollManager {
         nextEditor.revealRange(overlap, vscode.TextEditorRevealType.AtTop)
     }
 
-    getNextActiveEditor(editor: vscode.TextEditor, lr: 'left' | 'right' = 'right') {
+    getNextEditor(editor: vscode.TextEditor) {
         const column = editor.viewColumn
-        const lrNum = lr === 'right' ? 1 : -1
+        const lrNum = this.currentLeftRight === 'right' ? 1 : -1
         if (column === undefined) {
             return
         }
@@ -83,12 +85,12 @@ export class ScrollManager {
         return
     }
 
-    continueOnNext(lr: 'left' | 'right' = 'right') {
+    continueOnNext() {
         const activeEditor = vscode.window.activeTextEditor
         if (!activeEditor) {
             return
         }
-        const nextEditor = this.getNextActiveEditor(activeEditor, lr)
+        const nextEditor = this.getNextEditor(activeEditor)
         if (!nextEditor) {
             return
         }
