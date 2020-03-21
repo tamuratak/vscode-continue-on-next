@@ -1,15 +1,15 @@
 import * as vscode from 'vscode'
 
 export class ScrollerManager {
-    disposable?: vscode.Disposable
-    decoration?: vscode.TextEditorDecorationType
+    scrollEvent?: vscode.Disposable
+    decorationMap: Map<vscode.TextEditor, vscode.TextEditorDecorationType> = new Map()
     overlap: number = 0
 
     start() {
-        if (this.disposable) {
+        if (this.scrollEvent) {
             return
         }
-        this.disposable = vscode.window.onDidChangeTextEditorVisibleRanges((ev) => {
+        this.scrollEvent = vscode.window.onDidChangeTextEditorVisibleRanges((ev) => {
             const editor = ev.textEditor
             const nextEditor = this.getNextActiveEditor(editor)
             if (!nextEditor) {
@@ -24,10 +24,9 @@ export class ScrollerManager {
     }
 
     stop() {
-        this.disposable?.dispose()
-        this.disposable = undefined
-        this.decoration?.dispose()
-        this.decoration = undefined
+        this.scrollEvent?.dispose()
+        this.scrollEvent = undefined
+        this.decorationMap.forEach((v) => v.dispose())
     }
 
 
@@ -38,10 +37,10 @@ export class ScrollerManager {
     }
 
     decorate(editor: vscode.TextEditor, range: vscode.Range) {
-        this.decoration?.dispose()
+        this.decorationMap.get(editor)?.dispose()
         const option = { opacity: '0.3' }
         const deco = vscode.window.createTextEditorDecorationType(option)
-        this.decoration = deco
+        this.decorationMap.set(editor, deco)
         editor.setDecorations(deco, [range])
     }
 
