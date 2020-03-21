@@ -1,10 +1,10 @@
 import * as vscode from 'vscode'
 
-export class ScrollerManager {
+export class ScrollManager {
     scrollEvent?: vscode.Disposable
     changeVisibleTextEditors: vscode.Disposable
     decorationMap: Map<vscode.TextEditor, vscode.TextEditorDecorationType> = new Map()
-    overlap: number = 0
+    overlapLines: number = 0
 
     constructor() {
         this.changeVisibleTextEditors = vscode.window.onDidChangeVisibleTextEditors(() => {
@@ -14,6 +14,7 @@ export class ScrollerManager {
 
     dispose() {
         this.scrollEvent?.dispose()
+        this.scrollEvent = undefined
         this.changeVisibleTextEditors.dispose()
         this.decorationMap.forEach((v) => v.dispose())
     }
@@ -28,10 +29,9 @@ export class ScrollerManager {
             if (!nextEditor) {
                 return
             }
-            const range = ev.visibleRanges[0]
-            const lastLine = this.getLastLine(range)
-            this.decorate(editor, lastLine)
-            this.scrollNextEditor(nextEditor, range)
+            const overlap = this.getOverlapRange(ev.visibleRanges)
+            this.decorate(editor, overlap)
+            this.scroll(nextEditor, overlap)
         })
         this.continueOnRight()
     }
@@ -43,9 +43,10 @@ export class ScrollerManager {
     }
 
 
-    getLastLine(range: vscode.Range) {
-        const begPos = new vscode.Position(range.end.line - this.overlap, 0)
-        const endPos = new vscode.Position(range.end.line + 1, 10000)
+    getOverlapRange(visibleRanges: readonly vscode.Range[]) {
+        const endLine = Math.max(...visibleRanges.map((r) => r.end.line))
+        const begPos = new vscode.Position(endLine - this.overlapLines, 0)
+        const endPos = new vscode.Position(endLine + 1, 10000)
         return new vscode.Range(begPos, endPos)
     }
 
@@ -57,10 +58,8 @@ export class ScrollerManager {
         editor.setDecorations(deco, [range])
     }
 
-    scrollNextEditor(nextEditor: vscode.TextEditor, visibleRange: vscode.Range) {
-        const begPos = new vscode.Position(visibleRange.end.line - this.overlap, 0)
-        const endPos = new vscode.Position(visibleRange.end.line + 1, 0)
-        nextEditor.revealRange(new vscode.Range(begPos, endPos), vscode.TextEditorRevealType.AtTop)
+    scroll(nextEditor: vscode.TextEditor, overlap: vscode.Range) {
+        nextEditor.revealRange(overlap, vscode.TextEditorRevealType.AtTop)
     }
 
     getNextActiveEditor(editor: vscode.TextEditor) {
@@ -85,9 +84,8 @@ export class ScrollerManager {
         if (!nextEditor) {
             return
         }
-        const range = activeEditor.visibleRanges[0]
-        const lastLine = this.getLastLine(range)
-        this.decorate(activeEditor, lastLine)
-        this.scrollNextEditor(nextEditor, range)
+        const overlap = this.getOverlapRange(activeEditor.visibleRanges)
+        this.decorate(activeEditor, overlap)
+        this.scroll(nextEditor, overlap)
     }
 }
