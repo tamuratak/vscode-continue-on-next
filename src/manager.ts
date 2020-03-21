@@ -40,7 +40,7 @@ export class ScrollManager {
             }
             this.scroll(editor, nextEditor, ev.visibleRanges)
         })
-        this.continueOnRight()
+        this.continueOnNext()
     }
 
     stop() {
@@ -69,25 +69,26 @@ export class ScrollManager {
         nextEditor.revealRange(overlap, vscode.TextEditorRevealType.AtTop)
     }
 
-    getNextActiveEditor(editor: vscode.TextEditor) {
+    getNextActiveEditor(editor: vscode.TextEditor, lr: 'left' | 'right' = 'right') {
         const column = editor.viewColumn
+        const lrNum = lr === 'right' ? 1 : -1
         if (column === undefined) {
             return
         }
         for (const ed of vscode.window.visibleTextEditors) {
-            if (column + 1 === ed.viewColumn && editor.document.uri.toString() === ed.document.uri.toString()) {
+            if (column + lrNum === ed.viewColumn && editor.document.uri.toString() === ed.document.uri.toString()) {
                 return ed
             }
         }
         return
     }
 
-    continueOnRight() {
+    continueOnNext(lr: 'left' | 'right' = 'right') {
         const activeEditor = vscode.window.activeTextEditor
         if (!activeEditor) {
             return
         }
-        const nextEditor = this.getNextActiveEditor(activeEditor)
+        const nextEditor = this.getNextActiveEditor(activeEditor, lr)
         if (!nextEditor) {
             return
         }
