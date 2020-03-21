@@ -8,16 +8,24 @@ export class ScrollManager {
 
     constructor() {
         this.changeVisibleTextEditors = vscode.window.onDidChangeVisibleTextEditors(() => {
-            this.decorationMap.forEach((v) => v.dispose())
-            this.decorationMap.clear()
+            this.clearDecorationMap()
         })
     }
 
-    dispose() {
+    clearScrollEvent() {
         this.scrollEvent?.dispose()
         this.scrollEvent = undefined
-        this.changeVisibleTextEditors.dispose()
+    }
+
+    clearDecorationMap() {
         this.decorationMap.forEach((v) => v.dispose())
+        this.decorationMap.clear()
+    }
+
+    dispose() {
+        this.clearScrollEvent()
+        this.changeVisibleTextEditors.dispose()
+        this.clearDecorationMap()
     }
 
     start() {
@@ -36,11 +44,9 @@ export class ScrollManager {
     }
 
     stop() {
-        this.scrollEvent?.dispose()
-        this.scrollEvent = undefined
-        this.decorationMap.forEach((v) => v.dispose())
+        this.clearScrollEvent()
+        this.clearDecorationMap()
     }
-
 
     getOverlapRange(visibleRanges: readonly vscode.Range[]) {
         const endLine = Math.max(...visibleRanges.map((r) => r.end.line))
