@@ -2,8 +2,21 @@ import * as vscode from 'vscode'
 
 export class ScrollerManager {
     scrollEvent?: vscode.Disposable
+    changeVisibleTextEditors: vscode.Disposable
     decorationMap: Map<vscode.TextEditor, vscode.TextEditorDecorationType> = new Map()
     overlap: number = 0
+
+    constructor() {
+        this.changeVisibleTextEditors = vscode.window.onDidChangeVisibleTextEditors(() => {
+            this.decorationMap.forEach((v) => v.dispose())
+        })
+    }
+
+    dispose() {
+        this.scrollEvent?.dispose()
+        this.changeVisibleTextEditors.dispose()
+        this.decorationMap.forEach((v) => v.dispose())
+    }
 
     start() {
         if (this.scrollEvent) {
