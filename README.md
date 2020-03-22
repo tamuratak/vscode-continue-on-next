@@ -2,11 +2,11 @@
 
 ### Make your code continue on the next tab.
 
-![](./demo_media/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/tamuratak/vscode-continue-on-next/master/demo_media/screenshot.png)
 
-### A synchronous scroll is supported 😉
+### A synchronous scroll is supported. 😉
 
-![](./demo_media/m.gif)
+![synchronous scroll demo](https://raw.githubusercontent.com/tamuratak/vscode-continue-on-next/master/demo_media/m.gif)
 
 ### Usage
 
@@ -18,4 +18,4 @@ Open the Command Palette (Command+Shift+P on macOS and Ctrl+Shift+P on Windows/L
 | `Continue On Next: Left` | Continue the code on the left next tab. |
 | `Continue On Next: Stop` | Stop the feature. |
 
-![commands](./demo_media/command.png)
+![commands](https://raw.githubusercontent.com/tamuratak/vscode-continue-on-next/master/demo_media/command.png)
