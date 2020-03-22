@@ -9,4 +9,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push( vscode.commands.registerCommand('continue-on-next.stop', () => manager.stop() ) )
 }
 
-export function deactivate() {}
+export function deactivate() {
+    return
+}

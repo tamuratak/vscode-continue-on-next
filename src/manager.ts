@@ -6,7 +6,7 @@ export class ScrollManager {
     scrollEvent?: vscode.Disposable
     changeVisibleTextEditors: vscode.Disposable
     decorationMap: Map<vscode.TextEditor, vscode.TextEditorDecorationType> = new Map()
-    overlapLines: number = 0
+    overlapLines = 0
     currentLeftRight: LR = 'right'
 
     constructor() {
@@ -71,9 +71,30 @@ export class ScrollManager {
         nextEditor.revealRange(overlap, vscode.TextEditorRevealType.AtTop)
     }
 
+    lrNum() {
+        return this.currentLeftRight === 'right' ? 1 : -1
+    }
+
+    createNextEditor(editor: vscode.TextEditor) {
+        const column = editor.viewColumn
+        const lrNum = this.lrNum()
+        if (column === undefined) {
+            return
+        }
+        if (column === 0 && lrNum < 0) {
+            return
+        }
+        const doc = editor.document
+        if (lrNum < 0) {
+            return vscode.window.showTextDocument(doc, column + lrNum)
+        } else {
+            return vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside)
+        }
+    }
+
     getNextEditor(editor: vscode.TextEditor) {
         const column = editor.viewColumn
-        const lrNum = this.currentLeftRight === 'right' ? 1 : -1
+        const lrNum = this.lrNum()
         if (column === undefined) {
             return
         }
@@ -85,12 +106,12 @@ export class ScrollManager {
         return
     }
 
-    continueOnNext() {
+    async continueOnNext() {
         const activeEditor = vscode.window.activeTextEditor
         if (!activeEditor) {
             return
         }
-        const nextEditor = this.getNextEditor(activeEditor)
+        const nextEditor = this.getNextEditor(activeEditor) || await this.createNextEditor(activeEditor)
         if (!nextEditor) {
             return
         }
