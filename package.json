@@ -1,10 +1,10 @@
 {
   "name": "continue-on-next",
   "displayName": "Continue On Next",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "tamuratak",
   "license": "MIT",
-  "description": "Make the current document continue on the next tab",
+  "description": "Make your code continue on the next tab.",
   "homepage": "https://github.com/tamuratak/vscode-continue-on-next",
   "main": "./out/src/extension.js",
   "icon": "icon.png",
