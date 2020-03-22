@@ -1,0 +1,11 @@
+demo_media/
+src/
+tmp/
+.vscode/
+.vscode-test/
+.github/
+.gitignore
+tsconfig.json
+.eslintrc.json
+.eslintcache
+.eslintignore
